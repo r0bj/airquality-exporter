@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	ver string = "0.25"
+	ver string = "0.26"
 	// 0 retries, exit on failure
 	retries        int = 0
 	apiCallTimeout int = 10
@@ -150,6 +150,7 @@ func main() {
 
 	go recordMetrics()
 
+	slog.Info("Starting HTTP server", "address", *listenAddress)
 	http.Handle("/metrics", promhttp.Handler())
 	if err := http.ListenAndServe(*listenAddress, nil); err != nil {
 		slog.Error("Server error", "error", err)
