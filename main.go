@@ -11,22 +11,23 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/ryszard/sds011/go/sds011"
-	"github.com/alecthomas/kingpin/v2"
+	flag "github.com/spf13/pflag"
 )
 
 const (
-	ver string = "0.26"
+	ver string = "0.27"
 	// 0 retries, exit on failure
 	retries        int = 0
 	apiCallTimeout int = 10
 )
 
 var (
-	listenAddress = kingpin.Flag("web.listen-address", "Address to listen on for web interface and telemetry.").Default(":8080").String()
-	portPath      = kingpin.Flag("port-path", "Serial port path.").Default("/dev/ttyUSB0").String()
-	cycle         = kingpin.Flag("cycle", "Sensor cycle length in minutes.").Default("5").Int()
-	forceSetCycle = kingpin.Flag("force-set-cycle", "Force set cycle on every program start.").Default("true").Bool()
-	verbose       = kingpin.Flag("verbose", "Verbose mode.").Short('v').Bool()
+	listenAddress = flag.String("web.listen-address", ":8080", "Address to listen on for web interface and telemetry")
+	configFile    = flag.String("config-file", "config.ini", "Config file location")
+	portPath      = flag.String("port-path", "/dev/ttyUSB0", "Serial port path")
+	cycle         = flag.Int("cycle", 5, "Sensor cycle length in minutes")
+	forceSetCycle = flag.Bool("force-set-cycle", true, "Force set cycle on every program start")
+	verbose       = flag.Bool("verbose", false, "Enable verbose output")
 )
 
 var (
@@ -138,8 +139,7 @@ func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: loggingLevel}))
 	slog.SetDefault(logger)
 
-	kingpin.Version(ver)
-	kingpin.Parse()
+	flag.Parse()
 
 	if *verbose {
 		loggingLevel.Set(slog.LevelDebug)
